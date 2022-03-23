@@ -1,0 +1,37 @@
+<html>
+<head>
+    <title>Marmoset Viewer Leica Lens</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="./marmoset.js"></script>
+</head>
+
+<body>
+    <script>
+        var opts = { width: 1280, height: 720, autoStart: false, bare: true }
+        opts.thumbnailURL = "./assets/joe-wilson-mview-image20150428-19261-fbh3he.jpg?1430257178";
+        marmoset.showFrameTime = false;
+        marmoset.hostURL = "https://www.artstation.com";
+        marmoset.hostImage = "./assets/logo-marmoset.png";
+        marmoset.dataLocale = "https://viewer.marmoset.co/main/data/";
+        var currentViewer = marmoset.embed("./assets/lens.mview", opts);
+
+        if (window && document && currentViewer.resize) {
+            var lastResizeTimeout = null
+            function resizeMarmoset() {
+                var width = document.body.scrollWidth;
+                var height = document.body.scrollHeight;
+
+                if (lastResizeTimeout) {
+                    clearTimeout(lastResizeTimeout)
+                }
+                lastResizeTimeout = setTimeout(function () {
+                    currentViewer.resize(width, height);
+                }, 100
+                );
+            }
+            window.addEventListener('resize', resizeMarmoset);
+        }
+    </script>
+</body>
+
+</html>
