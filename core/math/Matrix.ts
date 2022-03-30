@@ -1,7 +1,9 @@
-var Matrix = {
-    type: Float32Array,
-    create: function (a, c, b, d, e, f, g, h, k, n, m, l, p, r, s, u) {
-        var q = new Matrix.type(16);
+import Vect from "./Vector";
+
+export default class Matrix {
+    static type: Float32Array;
+    static create(a: number, c: number, b: number, d: number, e: number, f: number, g: number, h: number, k: number, n: number, m: number, l: number, p: number, r: number, s: number, u: number) {
+        var q = new Float32Array(16);
         q[0] = a;
         q[4] = c;
         q[8] = b;
@@ -19,12 +21,12 @@ var Matrix = {
         q[11] = s;
         q[15] = u;
         return q
-    },
-    empty: function () {
-        return new Matrix.type(16)
-    },
-    identity: function () {
-        var a = new Matrix.type(16);
+    }
+    static empty() {
+        return new Float32Array(16)
+    }
+    static identity() {
+        var a = new Float32Array(16);
         a[0] = 1;
         a[4] = 0;
         a[8] = 0;
@@ -42,8 +44,8 @@ var Matrix = {
         a[11] = 0;
         a[15] = 1;
         return a
-    },
-    set: function (a, c, b, d, e, f, g, h, k, n, m, l, p, r, s, u, q) {
+    }
+    static set(a: Uint8Array, c: number, b: number, d: number, e: number, f: number, g: number, h: number, k: number, n: number, m: number, l: number, p: number, r: number, s: number, u: number, q: number) {
         a[0] = c;
         a[4] = b;
         a[8] = d;
@@ -60,12 +62,12 @@ var Matrix = {
         a[7] = s;
         a[11] = u;
         a[15] = q
-    },
-    translation: function (a, c, b, d) {
+    }
+    static translation(a: any, c: any, b: any, d: any) {
         Matrix.set(a, 1, 0, 0, c, 0, 1, 0, b, 0, 0, 1, d, 0, 0, 0, 1);
         return a
-    },
-    rotation: function (a, c, b) {
+    }
+    static rotation(a: number[], c: number, b: any) {
         a[0] = 1;
         a[4] = 0;
         a[8] = 0;
@@ -105,8 +107,8 @@ var Matrix = {
                     a[5] = d
         }
         return a
-    },
-    mul: function (a, c, b) {
+    }
+    mul(a: number[], c: number, b: number) {
         var d = c[0]
             , e = c[1]
             , f = c[2]
@@ -156,8 +158,8 @@ var Matrix = {
         a[14] = w * f + v * n + t * r + y * x;
         a[15] = w * g + v * m + t * s + y * c;
         return a
-    },
-    invert: function (a, c) {
+    }
+    invert(a: number[], c: number) {
         var b = c[0]
             , d = c[1]
             , e = c[2]
@@ -207,8 +209,8 @@ var Matrix = {
         a[14] = (u * v - s * y - q * w) * D;
         a[15] = (m * y - l * v + p * w) * D;
         return a
-    },
-    transpose: function (a, c) {
+    }
+    transpose(a: number, c: number) {
         a[0] = c[0];
         a[4] = c[1];
         a[8] = c[2];
@@ -226,27 +228,27 @@ var Matrix = {
         a[11] = c[14];
         a[15] = c[15];
         return a
-    },
-    mul4: function (a, c, b, d, e, f) {
+    }
+    mul4(a: number[], c: number[], b: number, d: number, e: number, f: number) {
         a[0] = c[0] * b + c[4] * d + c[8] * e + c[12] * f;
         a[1] = c[1] * b + c[5] * d + c[9] * e + c[13] * f;
         a[2] = c[2] * b + c[6] * d + c[10] * e + c[14] * f;
         a[3] = c[3] * b + c[7] * d + c[11] * e + c[15] * f;
         return a
-    },
-    mulPoint: function (a, c, b, d, e) {
+    }
+    mulPoint(a: number, c: number[], b: number, d: number, e: number) {
         a[0] = c[0] * b + c[4] * d + c[8] * e + c[12];
         a[1] = c[1] * b + c[5] * d + c[9] * e + c[13];
         a[2] = c[2] * b + c[6] * d + c[10] * e + c[14];
         return a
-    },
-    mulVec: function (a, c, b, d, e) {
+    }
+    mulVec(a: number[], c: number[], b: number, d: number, e: number) {
         a[0] = c[0] * b + c[4] * d + c[8] * e;
         a[1] = c[1] * b + c[5] * d + c[9] * e;
         a[2] = c[2] * b + c[6] * d + c[10] * e;
         return a
-    },
-    perspective: function (a, c, b, d, e, f) {
+    }
+    perspective(a: number[], c: number, b: number, d: number, e: number, f: number) {
         f = f || 0;
         c = 1 / Math.tan(0.00872664625 * c);
         a[0] = c / b;
@@ -259,8 +261,8 @@ var Matrix = {
         a[14] = 2 * e * d / (d - e);
         a[12] = a[13] = a[15] = 0;
         return a
-    },
-    perspectiveInfinite: function (a, c, b, d, e) {
+    }
+    perspectiveInfinite(a: number[], c: number, b: number, d: number, e: number) {
         e = e || 0;
         c = 1 / Math.tan(0.00872664625 * c);
         a[0] = c / b;
@@ -272,8 +274,8 @@ var Matrix = {
         a[14] = -2 * d;
         a[12] = a[13] = a[15] = 0;
         return a
-    },
-    ortho: function (a, c, b, d, e, f, g, h) {
+    }
+    ortho(a: number[], c: number, b: number, d: number, e: number, f: number, g: number, h: any) {
         var k = 1 / (b - c)
             , n = 1 / (e - d)
             , m = 1 / (g - f);
@@ -288,8 +290,8 @@ var Matrix = {
         a[8] = a[9] = a[11] = 0;
         a[15] = 1;
         return a
-    },
-    lookAt: function (a, c, b, d) {
+    }
+    lookAt(a: Uint8Array, c: any, b: any, d: any) {
         var e = a.subarray(0, 3)
             , f = a.subarray(4, 7)
             , g = a.subarray(8, 11);
@@ -299,12 +301,12 @@ var Matrix = {
         Vect.normalize(e, e);
         Vect.cross(f, g, e);
         Matrix.set(a, e[0], e[1], e[2], -Vect.dot(e, c), f[0], f[1], f[2], -Vect.dot(f, c), g[0], g[1], g[2], -Vect.dot(g, c), 0, 0, 0, 1)
-    },
-    copy: function (a, c) {
+    }
+    copy(a: number, c: number) {
         for (var b = 0; 16 > b; ++b)
             a[b] = c[b]
-    },
-    copyToBuffer: function (a, c, b) {
+    }
+    copyToBuffer(a: { [x: string]: any; }, c: number, b: number) {
         for (var d = 0; 16 > d; ++d)
             a[c + d] = b[d]
     }

@@ -1,4 +1,4 @@
-var Vect = {
+ const Vect = {
     type: Float32Array,
     create: function (a, c, b, d) {
         var e = new Vect.type(4);
@@ -145,11 +145,15 @@ var Vect = {
         a[3] = Math.max(c[3], b[3]);
         return a
     },
-    projectOnPlane: function (a, c, b, d) {
-        var e = Vect.empty();
-        Vect.sub(e, c, b);
-        b = Vect.dot(e, d);
-        smad(a, -b, normal, c);
-        return a
-    }
+    
+    // unfinished
+    // projectOnPlane: function (a, c, b, d) {
+    //     var e = Vect.empty();
+    //     Vect.sub(e, c, b);
+    //     b = Vect.dot(e, d);
+    //     smad(a, -b, normal, c);
+    //     return a
+    // }
 };
+
+export default Vect;
