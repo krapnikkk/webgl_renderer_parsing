@@ -30,14 +30,14 @@ SkinningCluster.prototype.solveClusterTransformAtFrame = function (a, c, b, d) {
     if (1 == this.linkMode) {
         var e = Matrix.identity();
         c = Matrix.identity();
-        a.evaluateModelPartTransformAtFrame(this.linkObjectIndex, b, e, !1);
-        a.evaluateModelPartTransformAtFrame(this.associateObjectIndex, b, c, !1);
+        a.evaluateModelPartTransformAtFrame(this.linkObjectIndex, b, e, false);
+        a.evaluateModelPartTransformAtFrame(this.associateObjectIndex, b, c, false);
         this.solveAdditiveClusterTransform(e, c, d)
     } else {
         var e = Matrix.identity()
             , f = Matrix.identity();
-        a.evaluateModelPartTransformAtFrame(this.linkObjectIndex, b, e, !1);
-        a.evaluateModelPartTransformAtFrame(c, b, f, !1);
+        a.evaluateModelPartTransformAtFrame(this.linkObjectIndex, b, e, false);
+        a.evaluateModelPartTransformAtFrame(c, b, f, false);
         this.solveSimpleClusterTransform(e, f, d)
     }
 }

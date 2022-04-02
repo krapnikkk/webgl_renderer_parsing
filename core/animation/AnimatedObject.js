@@ -9,7 +9,7 @@ function AnimatedObject(a, c, b) {
     this.emissiveProperty = this.offsetVProperty = this.offsetUProperty = this.material = 0;
     this.debugMe = c.debugMe;
     this.debugString = "";
-    this.hasTransform = !1;
+    this.hasTransform = false;
     this.modelPartIndex = c.modelPartIndex;
     this.modelPartFPS = c.modelPartFPS;
     this.modelPartScale = c.modelPartScale;
@@ -63,16 +63,16 @@ function AnimatedObject(a, c, b) {
     this.cachedWorldTransform3 = Matrix.identity();
     this.cachedFrame3 = this.cachedFrame2 = this.cachedFrame1 = this.cachedFrame0 = -10;
     this.cachedFrameUse3 = this.cachedFrameUse2 = this.cachedFrameUse1 = this.cachedFrameUse0 = 0;
-    this.useFixedLocalTransform = this.useFixedWorldTransform = !1
+    this.useFixedLocalTransform = this.useFixedWorldTransform = false
 }
 AnimatedObject.prototype.setFixedWorldTransform = function (a) {
-    this.useFixedWorldTransform = !0;
+    this.useFixedWorldTransform = true;
     Matrix.copy(this.cachedWorldTransform0, a)
 }
     ;
 AnimatedObject.prototype.setFixedLocalTransform = function (a) {
-    this.useFixedLocalTransform = !0;
-    this.animatedLocalTransform.lockTransform = !0;
+    this.useFixedLocalTransform = true;
+    this.animatedLocalTransform.lockTransform = true;
     Matrix.copy(this.animatedLocalTransform.cachedmatrix0, a)
 }
     ;
@@ -188,5 +188,5 @@ AnimatedObject.prototype.evaluateLocalTransformAtFramePercent = function (a, c, 
     ;
 AnimatedObject.prototype.hasAnimatedTransform = function () {
     var a = this.animatedLocalTransform;
-    return a.TX && 1 < a.TX.numKeyframes || a.TY && 1 < a.TY.numKeyframes || a.TZ && 1 < a.TZ.numKeyframes || a.RX && 1 < a.RX.numKeyframes || a.RY && 1 < a.RY.numKeyframes || a.RZ && 1 < a.RZ.numKeyframes || a.SX && 1 < a.SX.numKeyframes || a.SY && 1 < a.SY.numKeyframes || a.SZ && 1 < a.SZ.numKeyframes ? !0 : !1
+    return a.TX && 1 < a.TX.numKeyframes || a.TY && 1 < a.TY.numKeyframes || a.TZ && 1 < a.TZ.numKeyframes || a.RX && 1 < a.RX.numKeyframes || a.RY && 1 < a.RY.numKeyframes || a.RZ && 1 < a.RZ.numKeyframes || a.SX && 1 < a.SX.numKeyframes || a.SY && 1 < a.SY.numKeyframes || a.SZ && 1 < a.SZ.numKeyframes ? true : false
 };

@@ -1,7 +1,6 @@
  const Vect = {
-    type: Float32Array,
     create: function (a, c, b, d) {
-        var e = new Vect.type(4);
+        var e = new Float32Array(4);
         e[0] = a;
         e[1] = c;
         e[2] = b;
@@ -9,7 +8,7 @@
         return e
     },
     empty: function () {
-        return new Vect.type(4)
+        return new Float32Array(4)
     },
     set: function (a, c, b, d, e) {
         a[0] = c;

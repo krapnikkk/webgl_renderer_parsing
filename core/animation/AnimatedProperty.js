@@ -3,13 +3,13 @@ function AnimatedProperty() {
     this.keyframeBufferStartIndexFloat = -1;
     this.lastValue = this.interpolationOffsetUShort = this.frameIndexOffsetUShort = this.weighOutOffsetFloat = this.weighInOffsetFloat = this.valueOffsetFloat = this.indexUShortSkip = this.indexFloatSkip = this.interpolationType = this.bytesPerKeyFrame = this.keyframePackingType = 0;
     this.lastFramePercent = -10;
-    this.enable = !0;
+    this.enable = true;
     this.name = "NONE";
     this.splineKF0 = new KeyFrame(0, 0);
     this.splineKF1 = new KeyFrame(0, 0);
     this.splineKF2 = new KeyFrame(0, 0);
     this.splineKF3 = new KeyFrame(0, 0);
-    this.debugMe = !0;
+    this.debugMe = true;
     this.debugString = "";
     this.lastSearchIndex = 1;
     this.savedSearchIndex = 0;
@@ -95,7 +95,7 @@ AnimatedProperty.prototype.evaluate = function (a, c, b) {
                 break
             }
             if (1 == l || 3 == l) {
-                var p = l = !1
+                var p = l = false
                     , r = 0
                     , s = b.keyframesSharedBufferFloats[k + this.valueOffsetFloat]
                     , u = b.keyframesSharedBufferFloats[f + this.valueOffsetFloat]
@@ -116,12 +116,12 @@ AnimatedProperty.prototype.evaluate = function (a, c, b) {
                     y = b.keyframesSharedBufferFloats[f + this.weighInOffsetFloat],
                     A = b.keyframesSharedBufferFloats[k + this.weighOutOffsetFloat],
                     B = b.keyframesSharedBufferFloats[f + this.weighOutOffsetFloat]);
-                1 < h && (l = !0,
+                1 < h && (l = true,
                     r = b.keyframesSharedBufferFloats[d + (h - 2) * this.indexFloatSkip + this.valueOffsetFloat],
                     x = b.keyframesSharedBufferUShorts[e + (h - 2) * this.indexUShortSkip + this.frameIndexOffsetUShort],
                     0 != this.weighInOffsetFloat && (v = b.keyframesSharedBufferFloats[d + (h - 2) * this.indexFloatSkip + this.weighInOffsetFloat],
                         F = b.keyframesSharedBufferFloats[d + (h - 2) * this.indexFloatSkip + this.weighOutOffsetFloat]));
-                h < g - 1 && (p = !0,
+                h < g - 1 && (p = true,
                     q = b.keyframesSharedBufferFloats[d + (h + 1) * this.indexFloatSkip + this.valueOffsetFloat],
                     w = b.keyframesSharedBufferUShorts[e + (h + 1) * this.indexUShortSkip + this.frameIndexOffsetUShort],
                     0 != this.weighInOffsetFloat && (E = b.keyframesSharedBufferFloats[d + (h + 1) * this.indexFloatSkip + this.weighInOffsetFloat],

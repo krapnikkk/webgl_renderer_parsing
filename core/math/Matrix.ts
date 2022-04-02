@@ -1,7 +1,6 @@
 import Vect from "./Vector";
 
 export default class Matrix {
-    static type: Float32Array;
     static create(a: number, c: number, b: number, d: number, e: number, f: number, g: number, h: number, k: number, n: number, m: number, l: number, p: number, r: number, s: number, u: number) {
         var q = new Float32Array(16);
         q[0] = a;
@@ -67,7 +66,7 @@ export default class Matrix {
         Matrix.set(a, 1, 0, 0, c, 0, 1, 0, b, 0, 0, 1, d, 0, 0, 0, 1);
         return a
     }
-    static rotation(a: number[], c: number, b: any) {
+    static rotation(a: Float32Array, c: number, b: any) {
         a[0] = 1;
         a[4] = 0;
         a[8] = 0;
@@ -108,7 +107,7 @@ export default class Matrix {
         }
         return a
     }
-    mul(a: number[], c: number, b: number) {
+    static mul(a: Float32Array , c: Float32Array, b: Float32Array) {
         var d = c[0]
             , e = c[1]
             , f = c[2]
@@ -124,7 +123,7 @@ export default class Matrix {
             , u = c[12]
             , q = c[13]
             , x = c[14];
-        c = c[15];
+        var j = c[15];
         var w = b[0]
             , v = b[1]
             , t = b[2]
@@ -132,7 +131,7 @@ export default class Matrix {
         a[0] = w * d + v * h + t * l + y * u;
         a[1] = w * e + v * k + t * p + y * q;
         a[2] = w * f + v * n + t * r + y * x;
-        a[3] = w * g + v * m + t * s + y * c;
+        a[3] = w * g + v * m + t * s + y * j;
         w = b[4];
         v = b[5];
         t = b[6];
@@ -140,7 +139,7 @@ export default class Matrix {
         a[4] = w * d + v * h + t * l + y * u;
         a[5] = w * e + v * k + t * p + y * q;
         a[6] = w * f + v * n + t * r + y * x;
-        a[7] = w * g + v * m + t * s + y * c;
+        a[7] = w * g + v * m + t * s + y * j;
         w = b[8];
         v = b[9];
         t = b[10];
@@ -148,7 +147,7 @@ export default class Matrix {
         a[8] = w * d + v * h + t * l + y * u;
         a[9] = w * e + v * k + t * p + y * q;
         a[10] = w * f + v * n + t * r + y * x;
-        a[11] = w * g + v * m + t * s + y * c;
+        a[11] = w * g + v * m + t * s + y * j;
         w = b[12];
         v = b[13];
         t = b[14];
@@ -156,10 +155,10 @@ export default class Matrix {
         a[12] = w * d + v * h + t * l + y * u;
         a[13] = w * e + v * k + t * p + y * q;
         a[14] = w * f + v * n + t * r + y * x;
-        a[15] = w * g + v * m + t * s + y * c;
+        a[15] = w * g + v * m + t * s + y * j;
         return a
     }
-    invert(a: number[], c: number) {
+    static invert(a: Float32Array, c: Float32Array) {
         var b = c[0]
             , d = c[1]
             , e = c[2]
@@ -210,7 +209,7 @@ export default class Matrix {
         a[15] = (m * y - l * v + p * w) * D;
         return a
     }
-    transpose(a: number, c: number) {
+    static transpose(a: number, c: number) {
         a[0] = c[0];
         a[4] = c[1];
         a[8] = c[2];
@@ -229,26 +228,26 @@ export default class Matrix {
         a[15] = c[15];
         return a
     }
-    mul4(a: number[], c: number[], b: number, d: number, e: number, f: number) {
+    static mul4(a: Float32Array, c: Float32Array, b: number, d: number, e: number, f: number) {
         a[0] = c[0] * b + c[4] * d + c[8] * e + c[12] * f;
         a[1] = c[1] * b + c[5] * d + c[9] * e + c[13] * f;
         a[2] = c[2] * b + c[6] * d + c[10] * e + c[14] * f;
         a[3] = c[3] * b + c[7] * d + c[11] * e + c[15] * f;
         return a
     }
-    mulPoint(a: number, c: number[], b: number, d: number, e: number) {
+    static mulPoint(a: Float32Array, c: Float32Array, b: number, d: number, e: number) {
         a[0] = c[0] * b + c[4] * d + c[8] * e + c[12];
         a[1] = c[1] * b + c[5] * d + c[9] * e + c[13];
         a[2] = c[2] * b + c[6] * d + c[10] * e + c[14];
         return a
     }
-    mulVec(a: number[], c: number[], b: number, d: number, e: number) {
+    static mulVec(a: Float32Array, c: Float32Array, b: number, d: number, e: number) {
         a[0] = c[0] * b + c[4] * d + c[8] * e;
         a[1] = c[1] * b + c[5] * d + c[9] * e;
         a[2] = c[2] * b + c[6] * d + c[10] * e;
         return a
     }
-    perspective(a: number[], c: number, b: number, d: number, e: number, f: number) {
+    static perspective(a: Float32Array, c: number, b: number, d: number, e: number, f: number) {
         f = f || 0;
         c = 1 / Math.tan(0.00872664625 * c);
         a[0] = c / b;
@@ -262,7 +261,7 @@ export default class Matrix {
         a[12] = a[13] = a[15] = 0;
         return a
     }
-    perspectiveInfinite(a: number[], c: number, b: number, d: number, e: number) {
+    static perspectiveInfinite(a: Float32Array, c: number, b: number, d: number, e: number) {
         e = e || 0;
         c = 1 / Math.tan(0.00872664625 * c);
         a[0] = c / b;
@@ -275,7 +274,7 @@ export default class Matrix {
         a[12] = a[13] = a[15] = 0;
         return a
     }
-    ortho(a: number[], c: number, b: number, d: number, e: number, f: number, g: number, h: any) {
+    static ortho(a: Float32Array, c: number, b: number, d: number, e: number, f: number, g: number, h: any) {
         var k = 1 / (b - c)
             , n = 1 / (e - d)
             , m = 1 / (g - f);
@@ -291,7 +290,7 @@ export default class Matrix {
         a[15] = 1;
         return a
     }
-    lookAt(a: Uint8Array, c: any, b: any, d: any) {
+    static lookAt(a: Uint8Array, c: any, b: any, d: any) {
         var e = a.subarray(0, 3)
             , f = a.subarray(4, 7)
             , g = a.subarray(8, 11);
@@ -302,11 +301,11 @@ export default class Matrix {
         Vect.cross(f, g, e);
         Matrix.set(a, e[0], e[1], e[2], -Vect.dot(e, c), f[0], f[1], f[2], -Vect.dot(f, c), g[0], g[1], g[2], -Vect.dot(g, c), 0, 0, 0, 1)
     }
-    copy(a: number, c: number) {
+    static copy(a: number, c: number) {
         for (var b = 0; 16 > b; ++b)
             a[b] = c[b]
     }
-    copyToBuffer(a: { [x: string]: any; }, c: number, b: number) {
+    static copyToBuffer(a: { [x: string]: any; }, c: number, b: number) {
         for (var d = 0; 16 > d; ++d)
             a[c + d] = b[d]
     }

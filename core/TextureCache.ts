@@ -1,5 +1,7 @@
 import Framebuffer from "./Framebuffer";
+import { IFile, IWebGLRenderingContext } from "./interface";
 import Shader from "./shader/Shader";
+import Texture from "./Texture";
 import Network from "./utils/Network";
 
 export default class TextureCache {
@@ -73,7 +75,7 @@ export default class TextureCache {
         return originTex;
     }
 
-    static parseFile(file: IFile, complete: (image: HTMLImageElement) => void, image?: HTMLImageElement) {
+    static parseFile(file: IFile, complete: (image?: HTMLImageElement) => void, image?: HTMLImageElement) {
         let img = image || new Image();
         if ("undefined" != typeof URL && "undefined" != typeof URL.createObjectURL) {
             let blob = new Blob([file.data], {

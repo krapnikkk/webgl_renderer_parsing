@@ -17,7 +17,7 @@ function AnimatedTransform(a) {
     this.hasTranslation = this.TX && this.TY && this.TZ;
     this.hasRotation = this.RX && this.RY && this.RZ;
     this.hasScale = this.SX && this.SY && this.SZ;
-    this.lockTransform = !1
+    this.lockTransform = false
 }
 AnimatedTransform.prototype.getTRSValue = function (a, c, b) {
     if (!c)
@@ -83,7 +83,7 @@ AnimatedTransform.prototype.clearCachedTransforms = function () {
     this.SX && (this.SX.lastFramePercent = -10);
     this.SY && (this.SY.lastFramePercent = -10);
     this.SZ && (this.SZ.lastFramePercent = -10);
-    this.lockTransform = !1
+    this.lockTransform = false
 }
     ;
 AnimatedTransform.prototype.getCachedTransform = function (a) {

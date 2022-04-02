@@ -1,5 +1,6 @@
 import BigInt from "./BigInt";
 import ByteStream from "./ByteStream";
+import { IArchiveFileData } from "./interface";
 
 export default class Archive {
     files: { [key: string]: IArchiveFileData };

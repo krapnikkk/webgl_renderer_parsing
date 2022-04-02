@@ -37,7 +37,7 @@ Animation.prototype.evaluateModelPartTransformAtFrame = function (a, c, b, d) {
                 break
             } else
                 g = Matrix.identity(),
-                    f.evaluateLocalTransformAtFramePercent(c, g, !1, d),
+                    f.evaluateLocalTransformAtFramePercent(c, g, false, d),
                     Matrix.mul(b, g, b),
                     a == f.parentIndex && (e = 100),
                     a = f.parentIndex
@@ -98,14 +98,14 @@ Animation.prototype.isVisibleAtFramePercent = function (a, c) {
             if ("" != d.debugString || "" != d.visibleProperty.debugString)
                 return this.debugString += d.debugString,
                     this.debugString += d.visibleProperty.debugString,
-                    !1;
+                    false;
             if (0 == d.visibleProperty.lastValue)
-                return !1
+                return false
         }
         b == d.parentIndex && (e = 100);
         b = d.parentIndex
     }
-    return !0
+    return true
 }
     ;
 Animation.prototype.getWorldTransform = function (a, c, b, d, e) {
@@ -115,7 +115,7 @@ Animation.prototype.getWorldTransform = function (a, c, b, d, e) {
     else {
         var f = this.getObjectAnimationFramePercent(a, c)
             , g = Matrix.identity();
-        a.evaluateLocalTransformAtFramePercent(f, g, !0, e);
+        a.evaluateLocalTransformAtFramePercent(f, g, true, e);
         if (f = a.modelPartIndex != a.id) {
             var f = Matrix.identity()
                 , h = Matrix.identity();
@@ -129,7 +129,7 @@ Animation.prototype.getWorldTransform = function (a, c, b, d, e) {
                 a = this.animatedObjects[k],
                     f = this.getObjectAnimationFramePercent(a, c),
                     g = Matrix.identity(),
-                    a.evaluateLocalTransformAtFramePercent(f, g, !0, e),
+                    a.evaluateLocalTransformAtFramePercent(f, g, true, e),
                     (f = a.modelPartIndex != a.id) ? (f = Matrix.identity(),
                         this.getAnimatedLocalTransform(a.id, c, f),
                         h = Matrix.identity(),
@@ -149,37 +149,37 @@ Animation.prototype.hasParentInHierarchy = function (a, c) {
     for (var b = a.parentIndex, d = 0; 100 > d; d++) {
         a = this.animatedObjects[b];
         if (a.id == c)
-            return !0;
+            return true;
         b == a.parentIndex && (d = 100);
         b = a.parentIndex
     }
-    return !1
+    return false
 }
     ;
 Animation.prototype.hasParentTypeInHierarchy = function (a, c) {
     for (var b = a.parentIndex, d = 0; 100 > d; d++) {
         a = this.animatedObjects[b];
         if (a.sceneObjectType == c)
-            return !0;
+            return true;
         b == a.parentIndex && (d = 100);
         b = a.parentIndex
     }
-    return !1
+    return false
 }
     ;
 Animation.prototype.searchAnimationUpHierarchy = function (a) {
     for (var c = a.id, b = 0; 100 > b; b++) {
         a = this.animatedObjects[c];
         if (a.animatedLocalTransform && (a.hasAnimatedTransform() || a.id != a.modelPartIndex && this.searchAnimationUpHierarchy(this.animatedObjects[a.modelPartIndex])))
-            return !0;
+            return true;
         c == a.parentIndex && (b = 100);
         c = a.parentIndex
     }
-    return !1
+    return false
 }
     ;
 Animation.prototype.hasAnimationInHierarchy = function (a) {
-    return this.searchAnimationUpHierarchy(a) || a.id != a.modelPartIndex && this.searchAnimationUpHierarchy(this.animatedObjects[a.modelPartIndex]) || this.hasParentTypeInHierarchy(a, "TurnTableSO") || this.hasParentTypeInHierarchy(a, "CameraSO") || "CameraSO" == a.sceneObjectType ? !0 : !1
+    return this.searchAnimationUpHierarchy(a) || a.id != a.modelPartIndex && this.searchAnimationUpHierarchy(this.animatedObjects[a.modelPartIndex]) || this.hasParentTypeInHierarchy(a, "TurnTableSO") || this.hasParentTypeInHierarchy(a, "CameraSO") || "CameraSO" == a.sceneObjectType ? true : false
 }
     ;
 Animation.prototype.getObjectAnimationFramePercent = function (a, c) {

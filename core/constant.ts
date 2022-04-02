@@ -10,20 +10,19 @@ export const prepareEmbedParams = (a) => {
             var d = c[b].split("=");
             a[d[0]] = d[1]
         }
-    c = function (a) {
+    let check = function (a) {
         if (a | 0)
             return true;
         for (var b = "true True TRUE yes Yes YES".split(" "), c = 0; c < b.length; ++c)
             if (a === b[c])
                 return true;
         return false
-    }
-        ;
+    };
     a.width = a.width || 800;
     a.height = a.height || 600;
-    a.autoStart = c(a.autoStart);
-    a.pagePreset = c(a.pagePreset);
-    a.fullFrame = c(a.fullFrame) || c(a.bare);
+    a.autoStart = check(a.autoStart);
+    a.pagePreset = check(a.pagePreset);
+    a.fullFrame = check(a.fullFrame) || check(a.bare);
     a.fullFrame = !a.pagePreset && a.fullFrame;
     return a
 }
@@ -78,20 +77,20 @@ export const embed = (a, c) => {
     return b
 }
 
-export const fetchThumbnail = function (a, c, b, d) {
+export const fetchThumbnail = function (a, c, complete?: (image?: HTMLImageElement) => void, image?: HTMLImageElement) {
     var e = false
         , f = a + (-1 == a.indexOf("?") ? "?" : "&") + "thumb=1"
         , g = function (a) {
-            (a = (new Archive(a)).extract("thumbnail.jpg")) ? TextureCache.parseFile(a, c, d) : e ? b && b() : (e = true,
-                Network.fetchBinaryIncremental(f, g, b, 394240));
+            (a = (new Archive(a)).extract("thumbnail.jpg")) ? TextureCache.parseFile(a, c, image) : e ? complete && complete() : (e = true,
+                Network.fetchBinaryIncremental(f, g, complete, 394240));
             return 0
         };
-    Network.fetchBinaryIncremental(f, g, b, 65536)
+    Network.fetchBinaryIncremental(f, g, complete, 65536)
 }
 
 export const FullScreen = {
     support: function () {
-        return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled)
+        return !!document.fullscreenEnabled
     },
     begin: function (a, c) {
         var b = a.requestFullscreen || a.webkitRequestFullScreen || a.mozRequestFullScreen || a.msRequestFullscreen;
@@ -111,13 +110,15 @@ export const FullScreen = {
         }
     },
     end: function () {
-        var a = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+        var a = document.exitFullscreen ;
         a && a.bind(document)()
     },
     active: function () {
-        return !!(document.fullscreenElement || document.webkitIsFullScreen || document.mozFullScreenElement || document.msFullscreenElement)
+        return document.fullscreenElement
     }
 }
+
+export const dataLocale = (0 == window.location.protocol.indexOf("https") ? "https:" : "http:") + "//viewer.marmoset.co/main/data/";
 
 // marmoset = {};
 // (function (marmoset) {
@@ -225,7 +226,7 @@ export const FullScreen = {
 //             }
 //         },
 //         end: function () {
-//             var a = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+//             var a = document.exitFullscreen ;
 //             a && a.bind(document)()
 //         },
 //         active: function () {

@@ -1,3 +1,6 @@
+import { IFramebufferOptions } from "./interface";
+import Texture from "./Texture";
+
 export default class Framebuffer {
     gl: WebGLRenderingContext;
     fbo: WebGLFramebuffer;

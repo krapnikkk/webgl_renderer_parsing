@@ -37,7 +37,7 @@ Fog.prototype.draw = function (a, c) {
         var m = n.params;
         b.uniform3fv(m.uDepthToZ, f);
         b.uniform4fv(m.uUnproject, e);
-        b.uniformMatrix4fv(m.uInvViewMatrix, !1, d.transform);
+        b.uniformMatrix4fv(m.uInvViewMatrix, false, d.transform);
         b.uniform1f(m.uFogInvDistance, 1 / this.desc.distance);
         b.uniform1f(m.uFogOpacity, this.desc.opacity * (1 - a.stripData.activeFade()));
         b.uniform1f(m.uFogDispersion, 1 - this.desc.dispersion);
@@ -46,7 +46,7 @@ Fog.prototype.draw = function (a, c) {
         b.uniform3fv(m.uFogType, l);
         b.uniform3fv(m.uFogColor, this.desc.color);
         b.uniform1f(m.uFogIllum, 0 == g ? this.desc.skyIllum : this.desc.lightIllum);
-        b.uniformMatrix4fv(m.uLightMatrix, !1, a.lights.invMatrix);
+        b.uniformMatrix4fv(m.uLightMatrix, false, a.lights.invMatrix);
         if (0 == g) {
             h = new Float32Array(a.sky.diffuseCoefficients);
             for (k = 4; 16 > k; ++k)
@@ -66,7 +66,7 @@ Fog.prototype.draw = function (a, c) {
             b.uniform4fv(m.uSpotParams, [-l[0], -l[1], -l[2], 0 < p ? r * r : 0]);
             b.uniform4fv(m.uLightAttenuation, [a.lights.parameters[3 * h + 0], a.lights.parameters[3 * h + 1], a.lights.parameters[3 * h + 2], r]);
             k && (k = Matrix.mul(Matrix.empty(), a.lights.finalTransformBuffer.subarray(16 * h), a.lights.matrix),
-                b.uniformMatrix4fv(m.uShadowProj, !1, k),
+                b.uniformMatrix4fv(m.uShadowProj, false, k),
                 a.shadow.depthTextures[h].bind(n.samplers.uShadowMap),
                 h = 0,
                 1 < a.postRender.sampleCount && (h = a.postRender.currentSample() / a.postRender.sampleCount),
@@ -81,7 +81,7 @@ Fog.prototype.draw = function (a, c) {
         n = n.attribs.vCoord;
         b.bindBuffer(b.ARRAY_BUFFER, this.fullscreenTriangle);
         b.enableVertexAttribArray(n);
-        b.vertexAttribPointer(n, 2, b.FLOAT, !1, 0, 0);
+        b.vertexAttribPointer(n, 2, b.FLOAT, false, 0, 0);
         b.drawArrays(b.TRIANGLES, 0, 3);
         b.disableVertexAttribArray(n);
         b.bindBuffer(b.ARRAY_BUFFER, null)

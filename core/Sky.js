@@ -5,7 +5,7 @@ function Sky(a, c, b) {
         this.specularTexture = new Texture(a, {
             width: 256,
             height: 2048,
-            clamp: !0
+            clamp: true
         });
         c = d.data;
         for (var d = d.data.length, e = d / 4, f = new Uint8Array(d), g = 0, h = 0; g < d; ++h)
@@ -44,9 +44,9 @@ function Sky(a, c, b) {
             this.backgroundTexture = new Texture(a, {
                 width: 256,
                 height: 256,
-                clamp: !0
+                clamp: true
             });
-            b = !1;
+            b = false;
             var k;
             a.ext.textureHalf && a.ext.textureHalfLinear && (this.backgroundTexture.loadArray(null, a.RGB, a.ext.textureHalf.HALF_FLOAT_OES),
                 k = new Framebuffer(a, {
@@ -73,7 +73,7 @@ function Sky(a, c, b) {
             b = new Float32Array([-1, -1, 0.5, 1, 3, -1, 0.5, 1, -1, 3, 0.5, 1]);
             a.bufferData(a.ARRAY_BUFFER, b, a.STATIC_DRAW);
             a.enableVertexAttribArray(k.attribs.p);
-            a.vertexAttribPointer(k.attribs.p, 4, a.FLOAT, !1, 0, 0);
+            a.vertexAttribPointer(k.attribs.p, 4, a.FLOAT, false, 0, 0);
             a.drawArrays(a.TRIANGLES, 0, 3);
             a.disableVertexAttribArray(k.attribs.p)
         }
@@ -90,31 +90,31 @@ Sky.prototype.setClearColor = function () {
     ;
 Sky.prototype.draw = function (a) {
     if (1 > this.backgroundMode || marmoset.transparentBackground)
-        return !1;
+        return false;
     if (this.complete()) {
         var c = this.gl
             , b = this.backgroundShader
             , d = a.view
             , e = a.lights.invMatrix;
         b.bind();
-        c.uniformMatrix4fv(b.params.uInverseSkyMatrix, !1, e);
-        c.uniformMatrix4fv(b.params.uViewProjection, !1, d.viewProjectionMatrix);
+        c.uniformMatrix4fv(b.params.uInverseSkyMatrix, false, e);
+        c.uniformMatrix4fv(b.params.uViewProjection, false, d.viewProjectionMatrix);
         3 == this.backgroundMode ? c.uniform4fv(b.params.uSkyCoefficients, this.backgroundCoefficients) : this.backgroundTexture.bind(b.samplers.tSkyTexture);
         a = 0.07 + 0.94 * (1 - a.stripData.activeFade());
         c.uniform1f(b.params.uAlpha, a);
         c.bindBuffer(c.ARRAY_BUFFER, this.vertexBuffer);
         c.enableVertexAttribArray(b.attribs.vPosition);
-        c.vertexAttribPointer(b.attribs.vPosition, 3, c.FLOAT, !1, 20, 0);
+        c.vertexAttribPointer(b.attribs.vPosition, 3, c.FLOAT, false, 20, 0);
         c.enableVertexAttribArray(b.attribs.vTexCoord);
-        c.vertexAttribPointer(b.attribs.vTexCoord, 2, c.FLOAT, !1, 20, 12);
+        c.vertexAttribPointer(b.attribs.vTexCoord, 2, c.FLOAT, false, 20, 12);
         c.bindBuffer(c.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         1 > a && (c.enable(c.BLEND),
             c.blendFunc(c.SRC_ALPHA, c.ONE_MINUS_SRC_ALPHA));
-        c.depthMask(!1);
+        c.depthMask(false);
         c.disable(c.DEPTH_TEST);
         c.drawElements(c.TRIANGLES, this.skyIndexCount, c.UNSIGNED_SHORT, 0);
         c.enable(c.DEPTH_TEST);
-        c.depthMask(!0);
+        c.depthMask(true);
         1 > a && c.disable(c.BLEND);
         c.disableVertexAttribArray(b.attribs.vPosition);
         c.disableVertexAttribArray(b.attribs.vTexCoord)
@@ -122,6 +122,6 @@ Sky.prototype.draw = function (a) {
 }
     ;
 Sky.prototype.complete = function () {
-    return this.backgroundShader && !this.backgroundShader.complete() ? !1 : this.specularTexture.complete()
+    return this.backgroundShader && !this.backgroundShader.complete() ? false : this.specularTexture.complete()
 }
     ;

@@ -29,7 +29,7 @@ function PostRender(a, c, b) {
             c = {
                 width: 256,
                 height: 256,
-                clamp: !0
+                clamp: true
             },
                 this.bloomTextures[b] = new Texture(a, c),
                 this.bloomTextures[b].loadArray(null, a.RGBA, a.ext.textureHalf && a.ext.textureHalfLinear ? a.ext.textureHalf.HALF_FLOAT_OES : a.UNSIGNED_BYTE),
@@ -58,7 +58,7 @@ function PostRender(a, c, b) {
         this.colorLUT = new Texture(this.gl, {
             width: a.length / 3 | 0,
             height: 1,
-            clamp: !0
+            clamp: true
         }),
         this.colorLUT.loadArray(new Uint8Array(a), this.gl.RGB));
     this.blackTexture = new Texture(this.gl, {
@@ -178,12 +178,12 @@ PostRender.prototype.allocAABuffer = function (a, c) {
         this.aaBuffer = new Texture(this.gl, {
             width: a,
             height: c,
-            clamp: !0
+            clamp: true
         }),
         this.aaBuffer.loadArray(),
         this.aaTarget = new Framebuffer(this.gl, {
             color0: this.aaBuffer,
-            ignoreStatus: !0
+            ignoreStatus: true
         }))
 }
     ;
@@ -209,7 +209,7 @@ PostRender.prototype.fillScreen = function (a) {
     var c = this.gl;
     c.bindBuffer(c.ARRAY_BUFFER, this.fullscreenTriangle);
     c.enableVertexAttribArray(a);
-    c.vertexAttribPointer(a, 2, c.FLOAT, !1, 0, 0);
+    c.vertexAttribPointer(a, 2, c.FLOAT, false, 0, 0);
     c.drawArrays(c.TRIANGLES, 0, 3);
     c.disableVertexAttribArray(a);
     c.bindBuffer(c.ARRAY_BUFFER, null)

@@ -160,10 +160,10 @@ Lights.prototype.update = function (a, c) {
         Matrix.invert(k, k);
         Matrix.copyToBuffer(this.inverseTransformBuffer, 16 * d, k)
     }
-    e = !1;
+    e = false;
     for (d = 0; d < b.length; ++d)
         if (b[d] != this.matrix[d]) {
-            e = !0;
+            e = true;
             break
         }
     for (d = 0; d < this.shadowCount; d++)

@@ -1,8 +1,14 @@
 import Archive from "../Archive";
+import { FullScreen } from "../constant";
 import Framebuffer from "../Framebuffer";
+import { IWebGLRenderingContext } from "../interface";
+import ShaderCache from "../shader/ShaderCache";
 import StripData from "../StripData";
+import Texture from "../Texture";
 import TextureCache from "../TextureCache";
 import Network from "../utils/Network";
+import Input from "./Input";
+import UI from "./UI";
 
 export default class WebViewer {
     mobile: boolean;
@@ -15,10 +21,10 @@ export default class WebViewer {
     sleepCounter: number;
     onLoad: any;
     stripData: any;
-    ui: any;
-    canvas: any;
+    ui: UI;
+    canvas: HTMLCanvasElement;
     pixelRatio: number;
-    gl: any;
+    gl: IWebGLRenderingContext;
     mainColor: Texture;
     mainDepth: any;
     mainBuffer: any;
@@ -42,7 +48,7 @@ export default class WebViewer {
                         break a
                     }
                 }
-                e = !1
+                e = false
             }
         this.desktopSlow = e;
         this.domRoot = document.createElement("div");
@@ -76,64 +82,64 @@ export default class WebViewer {
         this.domRoot.appendChild(this.canvas)
     }
     initGL() {
-        var a = {
+        var options = {
             alpha: !!marmoset.transparentBackground,
-            depth: !1,
-            stencil: !1,
-            antialias: !1,
+            depth: false,
+            stencil: false,
+            antialias: false,
             premultipliedAlpha: !!marmoset.transparentBackground,
-            preserveDrawingBuffer: !1
-        }
-            , a = this.gl = this.canvas.getContext("webgl", a) || this.canvas.getContext("experimental-webgl", a);
+            preserveDrawingBuffer: false
+        };
+        this.gl = this.canvas.getContext("webgl", options) as IWebGLRenderingContext;
         if (!this.gl)
             return this.ui.showFailure('Please <a href="http://get.webgl.org/" target=_blank>check<a/> to ensure your browser has support for WebGL.'),
-                !1;
+                false;
         this.canvas.addEventListener("webglcontextlost", function (a) {
             a.preventDefault()
         }
-            .bind(this), !1);
+            .bind(this), false);
         this.canvas.addEventListener("webglcontextrestored", function (a) {
             this.loadScene(this.sceneURL)
         }
-            .bind(this), !1);
-        a.ext = {
-            textureAniso: a.getExtension("EXT_texture_filter_anisotropic") || a.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || a.getExtension("MOZ_EXT_texture_filter_anisotropic"),
-            textureFloat: a.getExtension("OES_texture_float"),
-            textureFloatLinear: a.getExtension("OES_texture_float_linear"),
-            textureHalf: a.getExtension("OES_texture_half_float"),
-            textureHalfLinear: a.getExtension("OES_texture_half_float_linear"),
-            textureDepth: a.getExtension("WEBGL_depth_texture"),
-            colorBufferFloat: a.getExtension("WEBGL_color_buffer_float"),
-            colorBufferHalf: a.getExtension("EXT_color_buffer_half_float"),
-            index32bit: a.getExtension("OES_element_index_uint"),
-            loseContext: a.getExtension("WEBGL_lose_context"),
-            derivatives: a.getExtension("OES_standard_derivatives"),
-            renderInfo: a.getExtension("WEBGL_debug_renderer_info")
+            .bind(this), false);
+        this.gl.ext = {
+            textureAniso: this.gl.getExtension("EXT_texture_filter_anisotropic") || this.gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || this.gl.getExtension("MOZ_EXT_texture_filter_anisotropic"),
+            textureFloat: this.gl.getExtension("OES_texture_float"),
+            textureFloatLinear: this.gl.getExtension("OES_texture_float_linear"),
+            textureHalf: this.gl.getExtension("OES_texture_half_float"),
+            textureHalfLinear: this.gl.getExtension("OES_texture_half_float_linear"),
+            textureDepth: this.gl.getExtension("WEBGL_depth_texture"),
+            colorBufferFloat: this.gl.getExtension("WEBGL_color_buffer_float"),
+            colorBufferHalf: this.gl.getExtension("EXT_color_buffer_half_float"),
+            index32bit: this.gl.getExtension("OES_element_index_uint"),
+            loseContext: this.gl.getExtension("WEBGL_lose_context"),
+            derivatives: this.gl.getExtension("OES_standard_derivatives"),
+            renderInfo: this.gl.getExtension("WEBGL_debug_renderer_info")
         };
-        a.limits = {
-            textureSize: a.getParameter(a.MAX_TEXTURE_SIZE),
-            textureCount: a.getParameter(a.MAX_TEXTURE_IMAGE_UNITS),
-            varyings: a.getParameter(a.MAX_VARYING_VECTORS),
-            vertexAttribs: a.getParameter(a.MAX_VERTEX_ATTRIBS),
-            vertexUniforms: a.getParameter(a.MAX_VERTEX_UNIFORM_VECTORS),
-            fragmentUniforms: a.getParameter(a.MAX_FRAGMENT_UNIFORM_VECTORS),
-            viewportSizes: a.getParameter(a.MAX_VIEWPORT_DIMS),
-            vendor: a.getParameter(a.VENDOR),
-            version: a.getParameter(a.VERSION)
+        this.gl.limits = {
+            textureSize: this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE),
+            textureCount: this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS),
+            varyings: this.gl.getParameter(this.gl.MAX_VARYING_VECTORS),
+            vertexAttribs: this.gl.getParameter(this.gl.MAX_VERTEX_ATTRIBS),
+            vertexUniforms: this.gl.getParameter(this.gl.MAX_VERTEX_UNIFORM_VECTORS),
+            fragmentUniforms: this.gl.getParameter(this.gl.MAX_FRAGMENT_UNIFORM_VECTORS),
+            viewportSizes: this.gl.getParameter(this.gl.MAX_VIEWPORT_DIMS),
+            vendor: this.gl.getParameter(this.gl.VENDOR),
+            version: this.gl.getParameter(this.gl.VERSION)
         };
-        a.hints = {
+        this.gl.hints = {
             mobile: this.mobile,
             pixelRatio: this.pixelRatio
         };
-        a.enable(a.DEPTH_TEST);
-        a.shaderCache = new ShaderCache(a);
-        a.textureCache = new TextureCache(a);
+        this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.shaderCache = new ShaderCache(this.gl);
+        this.gl.textureCache = new TextureCache(this.gl);
         this.allocBacking();
-        return !0
+        return true
     }
     allocBacking() {
         var a = this.gl
-            , c = !1
+            , c = false
             , b = {
                 width: this.canvas.width,
                 height: this.canvas.height
@@ -143,7 +149,7 @@ export default class WebViewer {
         a.ext.textureDepth && (this.mainDepth = new Texture(a, {
             width: this.canvas.width,
             height: this.canvas.height,
-            nofilter: !0
+            nofilter: true
         }),
             this.mainDepth.loadArray(null, a.DEPTH_COMPONENT, a.UNSIGNED_INT));
         a.ext.textureHalf && a.ext.textureHalfLinear && (this.mainColor.loadArray(null, a.RGBA, a.ext.textureHalf.HALF_FLOAT_OES),
@@ -182,7 +188,7 @@ export default class WebViewer {
         this.scene = this.input = null;
         if (this.initGL() && this.sceneURL) {
             var c = this.ui.signalLoadProgress.bind(this.ui);
-            a(a) {
+            a = (a) => {
                 c(1, 1);
                 this.scene = new Scene(this.gl);
                 this.scene.stripData = this.stripData;
@@ -197,12 +203,10 @@ export default class WebViewer {
                     }
                 else
                     this.ui.showFailure("Package file could not be read or is invalid.")
-            }
-                .bind(this);
-            var b() {
+            };
+            var b = () => {
                 this.ui.showFailure("Package file (" + this.sceneURL + ") could not be retrieved.")
-            }
-                .bind(this);
+            };
             Network.fetchBinary(this.sceneURL, a, b, c)
         }
     }
@@ -232,8 +236,7 @@ export default class WebViewer {
             c.rotation[0] = -90 > c.rotation[0] ? -90 : c.rotation[0];
             c.updateView();
             this.wake()
-        }
-            .bind(this));
+        }.bind(this));
         this.input.onPan.push(function (a, c) {
             var b = this.scene.view
                 , d = b.fov / 45 * 0.8 * (b.radius / this.domRoot.clientHeight)
@@ -269,25 +272,24 @@ export default class WebViewer {
             .bind(this));
         this.ui.bindInput(this.input)
     }
-    wake(a) {
-        a = a || 16;
-        this.sleepCounter = this.sleepCounter < a ? a : this.sleepCounter;
+    wake(sleepCounter?: number) {
+        sleepCounter = sleepCounter || 16;
+        this.sleepCounter = this.sleepCounter < sleepCounter ? sleepCounter : this.sleepCounter;
         this.scene.postRender.discardAAHistory();
         this.requestFrame(this.update.bind(this))
     }
     requestFrame(a) {
-        var c = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+        var c = window.requestAnimationFrame;
         if (!this.frameRequestPending) {
-            var b() {
+            var b = () => {
                 this.frameRequestPending = 0;
                 a()
-            }
-                .bind(this);
+            };
             this.frameRequestPending = c(b, this.canvas)
         }
     }
     cancelFrame() {
-        this.frameRequestPending && (window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame || window.msCancelAnimationFrame)(this.frameRequestPending)
+        this.frameRequestPending && window.cancelAnimationFrame(this.frameRequestPending)
     }
     fullscreenChange() {
         FullScreen.active() ? (this.oldRootWidth = this.domRoot.style.width,
@@ -295,17 +297,20 @@ export default class WebViewer {
             this.domRoot.style.width = "100%",
             this.domRoot.style.height = "100%") : (this.domRoot.style.width = this.oldRootWidth,
                 this.domRoot.style.height = this.oldRootHeight);
-        this.wake()
+        this.wake();
     }
-    resize(a, c) {
-        a && c ? (this.domRoot.style.width = a + "px",
-            this.domRoot.style.height = c + "px") : (a = this.domRoot.clientWidth,
-                c = this.domRoot.clientHeight);
-        this.canvas.width = a * this.pixelRatio;
-        this.canvas.height = c * this.pixelRatio;
-        this.canvas.style.width = a + "px";
-        this.canvas.style.height = c + "px";
-        this.ui.setSize(a, c);
+    resize(width?: number, height?: number) {
+        if(width && height){
+            this.domRoot.style.width = width + "px", this.domRoot.style.height = height + "px"
+        }else{
+            width = this.domRoot.clientWidth;
+            height = this.domRoot.clientHeight
+        }
+        this.canvas.width = width * this.pixelRatio;
+        this.canvas.height = height * this.pixelRatio;
+        this.canvas.style.width = width + "px";
+        this.canvas.style.height = height + "px";
+        this.ui.setSize(width, height);
         this.allocBacking();
         this.wake()
     }

@@ -1,4 +1,5 @@
 import ByteStream from "./ByteStream";
+import { IMeshDesc, IArchiveFileData } from "./interface";
 import Matrix from "./math/Matrix";
 import Vect from "./math/Vector";
 
@@ -21,7 +22,7 @@ export default class Mesh{
     vertexCount: number;
     vertexBuffer: WebGLBuffer;
     bounds: { min: any; max: any;maxExtent?:any,averageExtent?:any };
-    constructor(gl:WebGLRenderingContext,desc:MeshDesc,archiveFileData:IArchiveFileData){
+    constructor(gl:WebGLRenderingContext,desc:IMeshDesc,archiveFileData:IArchiveFileData){
         var d = desc.isDynamicMesh;
         this.numSubMeshes = 0;
         this.displayMatrix = Matrix.identity();

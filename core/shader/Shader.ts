@@ -1,7 +1,9 @@
+import { IShaderParams, IWebGLRenderingContext } from "../interface";
+
 export default class Shader {
     gl: IWebGLRenderingContext;
     program: WebGLProgram;
-    params: {};
+    params: IShaderParams;
     samplers: {[key:string]:any};
     attribs: {[key:string]:number};
     constructor(gl: IWebGLRenderingContext) {

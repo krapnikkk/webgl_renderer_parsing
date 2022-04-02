@@ -1,13 +1,14 @@
+import { IWebGLRenderingContext, ITextureDesc } from "./interface";
 
 
-class Texture {
+export default class Texture {
     gl: IWebGLRenderingContext;
     componentType: GLenum;
     format: GLenum;
     type: GLenum;
     id: WebGLTexture = null;
-    desc: TextureDesc
-    constructor(gl: IWebGLRenderingContext, desc: TextureDesc) {
+    desc: ITextureDesc
+    constructor(gl: IWebGLRenderingContext, desc: ITextureDesc) {
         this.gl = gl;
         this.type = gl.TEXTURE_2D;
         this.format = gl.RGBA;
