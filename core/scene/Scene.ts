@@ -8,6 +8,9 @@ import ShadowFloor from "../shader/ShadowFloor";
 import Texture from "../Texture";
 import SceneAnimator from "./SceneAnimator";
 import View from "./View";
+import Sky from "../Sky"
+import MeshRenderable from "../MeshRenderable";
+import Lights from "../Lights";
 
 export default class Scene {
     gl: IWebGLRenderingContext;
@@ -16,7 +19,7 @@ export default class Scene {
     meshRenderables: any[];
     materials: {};
     sky: any;
-    view: any;
+    view: View;
     selectedPartIndex: number;
     soloPart: boolean;
     miscnotes: string;

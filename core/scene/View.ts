@@ -1,6 +1,7 @@
+import { IViewDesc } from "../interface";
 import Matrix from "../math/Matrix";
 
-export default class View{
+export default class View {
     pivot: number[];
     rotation: number[];
     radius: number;
@@ -11,9 +12,9 @@ export default class View{
     viewMatrix: Float32Array;
     projectionMatrix: Float32Array;
     viewProjectionMatrix: Float32Array;
-    resetDesc: { angles: any[]; pivot: any[]; limits: any; orbitRadius: any; fov: any; };
+    resetDesc: IViewDesc;
     limits: any;
-    constructor(a) {
+    constructor(viewDesc: IViewDesc) {
         this.pivot = [0, 0, 0];
         this.rotation = [0, 0];
         this.radius = 1;
@@ -24,10 +25,15 @@ export default class View{
         this.viewMatrix = Matrix.empty();
         this.projectionMatrix = Matrix.empty();
         this.viewProjectionMatrix = Matrix.empty();
-        a ? this.loadView(a, true) : (this.saveResetView(),
-            this.updateView(),
-            this.updateProjection())
+        if (viewDesc) {
+            this.loadView(viewDesc, true)
+        } else {
+            this.saveResetView(),
+                this.updateView(),
+                this.updateProjection()
+        }
     }
+
     saveResetView() {
         this.resetDesc = {
             angles: [this.rotation[0], this.rotation[1]],
@@ -37,18 +43,20 @@ export default class View{
             fov: this.fov
         }
     }
-    loadView(a, c) {
-        a && (this.rotation[0] = a.angles[0],
-            this.rotation[1] = a.angles[1],
-            this.pivot[0] = a.pivot[0],
-            this.pivot[1] = a.pivot[1],
-            this.pivot[2] = a.pivot[2],
-            this.radius = a.orbitRadius,
-            this.fov = a.fov,
-            this.limits = a.limits,
-            c && this.saveResetView(),
-            this.updateView(),
-            this.updateProjection())
+    loadView(viewDesc: IViewDesc, reset?: boolean) {
+        if (viewDesc) {
+            this.rotation[0] = viewDesc.angles[0],
+                this.rotation[1] = viewDesc.angles[1],
+                this.pivot[0] = viewDesc.pivot[0],
+                this.pivot[1] = viewDesc.pivot[1],
+                this.pivot[2] = viewDesc.pivot[2],
+                this.radius = viewDesc.orbitRadius,
+                this.fov = viewDesc.fov,
+                this.limits = viewDesc.limits,
+                reset && this.saveResetView(),
+                this.updateView(),
+                this.updateProjection()
+        }
     }
     reset() {
         this.loadView(this.resetDesc)
@@ -88,7 +96,7 @@ export default class View{
         Matrix.invert(this.viewMatrix, this.transform);
         Matrix.mul(this.viewProjectionMatrix, this.viewMatrix, this.projectionMatrix)
     }
-    updateProjection(a?:number) {
+    updateProjection(a?: number) {
         Matrix.perspectiveInfinite(this.projectionMatrix, this.fov, this.size[0] / this.size[1], this.nearPlane, a);
         Matrix.mul(this.viewProjectionMatrix, this.projectionMatrix, this.viewMatrix)
     }

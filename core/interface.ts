@@ -5,6 +5,14 @@ import ShaderCache from "./shader/ShaderCache"
 import Texture from "./Texture"
 import TextureCache from "./TextureCache"
 
+export interface IViewDesc{
+    angles:number[],
+    pivot:number[],
+    orbitRadius:number,
+    fov:number,
+    limits:number
+}
+
 export interface ITextureDesc {
     width?: number,
     height?: number,
@@ -29,8 +37,16 @@ export interface IMeshDesc {
     isDynamicMesh: boolean
 }
 
+export interface ISkyDesc{
+    diffuseCoefficients:Iterable<number>,
+    backgroundMode:number,
+    backgroundBrightness:number,
+    backgroundColor:Iterable<number>,
+}
+
 
 export interface IWebGLRenderingContext extends WebGLRenderingContext {
+    length: number
     limits: {
         textureSize: GLenum,
         textureCount: GLenum,
@@ -80,6 +96,8 @@ export interface IShaderParams{
     uInvShadowMatrices?:WebGLUniformLocation,
     uShadowTexelPadProjections?:WebGLUniformLocation,
     uShadowCatcherParams?:WebGLUniformLocation,
+    location?:GLenum
+    uKernel?:GLenum
 }
 
 export interface IFile {
@@ -88,7 +106,7 @@ export interface IFile {
     type: string
 }
 
-export interface IFramebufferOptions {
+export interface IFramebufferDesc {
     color0?: Texture,
     width?: number,
     height?: number,

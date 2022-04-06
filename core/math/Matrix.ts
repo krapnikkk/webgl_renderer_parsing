@@ -1,6 +1,7 @@
 import Vect from "./Vector";
 
 export default class Matrix {
+    static type: any;
     static create(a: number, c: number, b: number, d: number, e: number, f: number, g: number, h: number, k: number, n: number, m: number, l: number, p: number, r: number, s: number, u: number) {
         var q = new Float32Array(16);
         q[0] = a;
@@ -44,7 +45,7 @@ export default class Matrix {
         a[15] = 1;
         return a
     }
-    static set(a: Uint8Array, c: number, b: number, d: number, e: number, f: number, g: number, h: number, k: number, n: number, m: number, l: number, p: number, r: number, s: number, u: number, q: number) {
+    static set(a: Float32Array, c: number, b: number, d: number, e: number, f: number, g: number, h: number, k: number, n: number, m: number, l: number, p: number, r: number, s: number, u: number, q: number) {
         a[0] = c;
         a[4] = b;
         a[8] = d;
@@ -62,7 +63,7 @@ export default class Matrix {
         a[11] = u;
         a[15] = q
     }
-    static translation(a: any, c: any, b: any, d: any) {
+    static translation(a: Float32Array, c: any, b: any, d: any):Float32Array {
         Matrix.set(a, 1, 0, 0, c, 0, 1, 0, b, 0, 0, 1, d, 0, 0, 0, 1);
         return a
     }
@@ -209,7 +210,7 @@ export default class Matrix {
         a[15] = (m * y - l * v + p * w) * D;
         return a
     }
-    static transpose(a: number, c: number) {
+    static transpose(a: Float32Array, c: Float32Array) {
         a[0] = c[0];
         a[4] = c[1];
         a[8] = c[2];
@@ -290,7 +291,7 @@ export default class Matrix {
         a[15] = 1;
         return a
     }
-    static lookAt(a: Uint8Array, c: any, b: any, d: any) {
+    static lookAt(a: Float32Array, c: any, b: any, d: any) {
         var e = a.subarray(0, 3)
             , f = a.subarray(4, 7)
             , g = a.subarray(8, 11);
@@ -301,7 +302,7 @@ export default class Matrix {
         Vect.cross(f, g, e);
         Matrix.set(a, e[0], e[1], e[2], -Vect.dot(e, c), f[0], f[1], f[2], -Vect.dot(f, c), g[0], g[1], g[2], -Vect.dot(g, c), 0, 0, 0, 1)
     }
-    static copy(a: number, c: number) {
+    static copy(a: Float32Array, c: Float32Array) {
         for (var b = 0; 16 > b; ++b)
             a[b] = c[b]
     }

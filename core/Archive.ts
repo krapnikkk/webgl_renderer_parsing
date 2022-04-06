@@ -26,10 +26,10 @@ export default class Archive {
         return this.files[a]
     }
     ;
-    extract(a) {
-        var c = this.files[a];
+    extract(a:string) {
+        var file = this.files[a];
         delete this.files[a];
-        return c
+        return file
     }
     ;
     checkSignature(a) {

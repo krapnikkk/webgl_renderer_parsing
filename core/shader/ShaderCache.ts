@@ -5,21 +5,21 @@ import ShaderTable from "./ShaderTable";
 
 export default class ShaderCache {
     gl: IWebGLRenderingContext;
-    cache: any[];
+    cache: {[key:string]:Shader};
     constructor(gl: IWebGLRenderingContext) {
         this.gl = gl;
-        this.cache = []
+        this.cache = {};
     }
 
-    fromURLs(a:string, c:string, b) {
+    fromURLs(a:string, c:string, defines?:string[]):Shader {
         var d = "";
-        if (b)
-            for (var e = 0; e < b.length; ++e)
-                d = b[e] + "\n" + d;
-        b = d + ":" + a + "|" + c;
-        e = this.cache[b];
-        if (void 0 !== e)
-            return e;
+        if (defines)
+            for (var e = 0; e < defines.length; ++e)
+                d = defines[e] + "\n" + d;
+        let defineStr = d + ":" + a + "|" + c;
+        let temp = this.cache[defineStr];
+        if (temp)
+            return temp;
         var f = new Shader(this.gl)
             , g = null
             , h = null
@@ -34,7 +34,7 @@ export default class ShaderCache {
             h = d + a;
             k()
         });
-        this.cache[b] = f
+        this.cache[defineStr] = f
         return f
     }
     fetch(a, c) {
