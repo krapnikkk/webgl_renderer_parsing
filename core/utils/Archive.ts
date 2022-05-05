@@ -1,6 +1,6 @@
-import BigInt from "./BigInt";
-import ByteStream from "./ByteStream";
-import { IArchiveFileData } from "./interface";
+import BigInt from "../BigInt";
+import ByteStream from "../ByteStream";
+import { IArchiveFileData } from "../interface";
 
 export default class Archive {
     files: { [key: string]: IArchiveFileData };
@@ -22,7 +22,7 @@ export default class Archive {
             }
         }
     }
-    get(a) {
+    get(a:string) {
         return this.files[a]
     }
     ;

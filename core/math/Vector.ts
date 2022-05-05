@@ -10,7 +10,7 @@
     empty: function () {
         return new Float32Array(4)
     },
-    set: function (a, c, b, d, e) {
+    set: function (a, c, b, d, e?) {
         a[0] = c;
         a[1] = b;
         a[2] = d;

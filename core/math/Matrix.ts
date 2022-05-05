@@ -248,7 +248,7 @@ export default class Matrix {
         a[2] = c[2] * b + c[6] * d + c[10] * e;
         return a
     }
-    static perspective(a: Float32Array, c: number, b: number, d: number, e: number, f: number) {
+    static perspective(a: Float32Array, c: number, b: number, d: number, e: number, f?: number) {
         f = f || 0;
         c = 1 / Math.tan(0.00872664625 * c);
         a[0] = c / b;
@@ -275,7 +275,7 @@ export default class Matrix {
         a[12] = a[13] = a[15] = 0;
         return a
     }
-    static ortho(a: Float32Array, c: number, b: number, d: number, e: number, f: number, g: number, h: any) {
+    static ortho(a: Float32Array, c: number, b: number, d: number, e: number, f: number, g: number, h?: any) {
         var k = 1 / (b - c)
             , n = 1 / (e - d)
             , m = 1 / (g - f);
@@ -306,7 +306,7 @@ export default class Matrix {
         for (var b = 0; 16 > b; ++b)
             a[b] = c[b]
     }
-    static copyToBuffer(a: { [x: string]: any; }, c: number, b: number) {
+    static copyToBuffer(a: Float32Array, c: number, b?: Float32Array) {
         for (var d = 0; 16 > d; ++d)
             a[c + d] = b[d]
     }

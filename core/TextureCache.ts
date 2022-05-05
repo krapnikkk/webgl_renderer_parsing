@@ -1,5 +1,5 @@
 import Framebuffer from "./Framebuffer";
-import { IFile, IWebGLRenderingContext } from "./interface";
+import { IFile, ITextureDesc, IWebGLRenderingContext } from "./interface";
 import Shader from "./shader/Shader";
 import Texture from "./Texture";
 import Network from "./utils/Network";
@@ -14,7 +14,7 @@ export default class TextureCache {
         // this.cache = []
     }
 
-    fromURL(url: string, desc: TextureDesc): Texture {
+    fromURL(url: string, desc: ITextureDesc): Texture {
         let texture = this.cache[url];
         if (texture)
             return texture;
@@ -25,7 +25,7 @@ export default class TextureCache {
         return this.cache[url] = texture;
     }
 
-    fromFile(file: IFile, desc: TextureDesc): Texture {
+    fromFile(file: IFile, desc: ITextureDesc): Texture {
         if (!file)
             return null;
         let texture = this.cache[file.name];
@@ -42,7 +42,7 @@ export default class TextureCache {
         }
     }
 
-    fromFilesMergeAlpha(albedoTex: IFile, alphaTex: IFile, desc: TextureDesc) {
+    fromFilesMergeAlpha(albedoTex: IFile, alphaTex: IFile, desc: ITextureDesc) {
         if (!alphaTex)
             return this.fromFile(albedoTex, desc);
         let textureName = albedoTex.name + "|" + alphaTex.name,

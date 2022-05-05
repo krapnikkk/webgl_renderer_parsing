@@ -1,4 +1,4 @@
-import Archive from "../Archive";
+import Archive from "../utils/Archive";
 import { FullScreen } from "../constant";
 import Framebuffer from "../Framebuffer";
 import { IWebGLRenderingContext } from "../interface";
@@ -9,13 +9,15 @@ import TextureCache from "../TextureCache";
 import Network from "../utils/Network";
 import Input from "./Input";
 import UI from "./UI";
+import Scene from "../scene/Scene";
+import marmoset from "../Config";
 
 export default class WebViewer {
     mobile: boolean;
     mobileFast: boolean;
     desktopSlow: any;
     domRoot: HTMLDivElement;
-    scene: any;
+    scene: Scene;
     input: any;
     sceneURL: any;
     sleepCounter: number;
@@ -83,11 +85,11 @@ export default class WebViewer {
     }
     initGL() {
         var options = {
-            alpha: !!marmoset.transparentBackground,
+            alpha: marmoset.transparentBackground,
             depth: false,
             stencil: false,
             antialias: false,
-            premultipliedAlpha: !!marmoset.transparentBackground,
+            premultipliedAlpha: marmoset.transparentBackground,
             preserveDrawingBuffer: false
         };
         this.gl = this.canvas.getContext("webgl", options) as IWebGLRenderingContext;
@@ -278,14 +280,15 @@ export default class WebViewer {
         this.scene.postRender.discardAAHistory();
         this.requestFrame(this.update.bind(this))
     }
-    requestFrame(a) {
+    requestFrame(a:Function) {
         var c = window.requestAnimationFrame;
         if (!this.frameRequestPending) {
             var b = () => {
                 this.frameRequestPending = 0;
                 a()
             };
-            this.frameRequestPending = c(b, this.canvas)
+            // this.frameRequestPending = c(b, this.canvas)
+            this.frameRequestPending = c(b)
         }
     }
     cancelFrame() {

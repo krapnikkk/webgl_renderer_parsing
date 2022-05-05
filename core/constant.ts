@@ -1,4 +1,4 @@
-import Archive from "./Archive";
+import Archive from "./utils/Archive";
 import WebViewer from "./gui/WebViewer";
 import TextureCache from "./TextureCache";
 import Network from "./utils/Network";

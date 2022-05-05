@@ -1,3 +1,4 @@
+import marmoset from "../Config";
 import { dataLocale, fetchThumbnail, FullScreen } from "../constant";
 import Network from "../utils/Network";
 import Button from "./Button";
@@ -148,9 +149,9 @@ export default class UI {
                 for (let h = 0; 2 > h; ++h) {
                     for (let c = tempImgData.data, k = imgData.data, n = 0, m = 0; m < height; ++m) {
                         for (let l = 0; l < width; ++l) {
-                            for (let p = 0, r = 0, s = 0, u = -2; 2 >= u; ++u) {
-                                for (let q = m + u, q = 0 > q ? 0 : q >= height ? height - 1 : q, x = -2; 2 >= x; ++x) {
-                                    let w = l + x
+                            for (var p = 0, r = 0, s = 0, u = -2; 2 >= u; ++u) {
+                                for (var q = m + u, q = 0 > q ? 0 : q >= height ? height - 1 : q, x = -2; 2 >= x; ++x) {
+                                    var w = l + x
                                         , w = 0 > w ? 0 : w >= width ? width - 1 : w
                                         , w = 4 * (q * width + w)
                                         , p = p + c[w]
@@ -175,13 +176,15 @@ export default class UI {
     showActiveView() {
         let a = this.thumbnail;
         this.clearView();
-        a && (this.fadeThumbnail = a,
-            this.fadeThumbnail.style.opacity = 1,
-            this.container.appendChild(this.fadeThumbnail));
+        if (this.thumbnail) {
+            this.fadeThumbnail = a,
+                this.fadeThumbnail.style.opacity = 1,
+                this.container.appendChild(this.fadeThumbnail)
+        };
         if (!marmoset.noUserInterface) {
             void 0 === marmoset.largeUI && (marmoset.largeUI = this.viewer.mobile);
             450 > this.container['width'] && (marmoset.largeUI = false);
-            a = 1;
+            let a = 1;
             window.devicePixelRatio && (2 < window.devicePixelRatio ? a = 4 : 1 < window.devicePixelRatio && (a = 2));
             marmoset.largeUI && 4 > a && (a *= 2);
             let c = marmoset.largeUI ? 0.3 : 0.5;
@@ -221,36 +224,36 @@ export default class UI {
             this.logo.style.right = marmoset.largeUI ? "-4px" : "1px";
             this.logo.style.top = marmoset.largeUI ? "0px" : "4px";
             this.logo.title = "Made with Marmoset Toolbag";
-            let e = document.createElement("input");
-            e.type = "image";
-            e.src = marmoset.dataLocale + "logo" + a + "x.png";
-            e.style.border = "none";
-            e.style.width = e.style.height = marmoset.largeUI ? "72px" : "36px";
-            e.style.border = "0px";
-            e.style.outline = "0px";
-            e.style.opacity = c + "";
-            e.onmouseover = function () {
+            let input = document.createElement("input");
+            input.type = "image";
+            input.src = marmoset.dataLocale + "logo" + a + "x.png";
+            input.style.border = "none";
+            input.style.width = input.style.height = marmoset.largeUI ? "72px" : "36px";
+            input.style.border = "0px";
+            input.style.outline = "0px";
+            input.style.opacity = c + "";
+            input.onmouseover = function () {
                 this.style.opacity = 1
-            }.bind(e);
-            e.onmouseout = function () {
+            }.bind(input);
+            input.onmouseout = function () {
                 this.style.opacity = c
-            }.bind(e);
-            e.onmouseover = function () {
+            }.bind(input);
+            input.onmouseover = function () {
                 this.style.opacity = 1
-            }.bind(e);
-            e.onmouseout = function () {
+            }.bind(input);
+            input.onmouseout = function () {
                 this.style.opacity = c
-            }.bind(e);
-            e.onclick = function (a) {
+            }.bind(input);
+            input.onclick = function (a) {
                 window.open("http://www.marmoset.co/viewer?utm_source=inapp&utm_medium=menu&utm_campaign=viewer", "_blank");
                 this.style.opacity = c
-            }.bind(e, this);
-            b = new XMLHttpRequest;
-            b.open("HEAD", e.src, true);
-            b.onload = function (a) {
+            }.bind(input, this);
+            let xhr = new XMLHttpRequest;
+            xhr.open("HEAD", input.src, true);
+            xhr.onload = function (a) {
                 this.logo.appendChild(a)
-            }.bind(this, e);
-            b.send();
+            }.bind(this, input);
+            xhr.send();
             this.sigCluster.appendChild(this.logo);
             b = this.viewer.scene.metaData;
             b.title = UI.sanitize(b.title);

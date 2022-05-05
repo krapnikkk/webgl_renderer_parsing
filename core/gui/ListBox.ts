@@ -1,3 +1,4 @@
+import marmoset from "../Config";
 import Button from "./Button";
 import ControlRect from "./ControlRect";
 import GUIRegion from "./GUIRegion";

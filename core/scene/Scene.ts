@@ -1,7 +1,7 @@
 import Bounds from "../Bounds";
 import ByteStream from "../ByteStream";
 import Framebuffer from "../Framebuffer";
-import { IWebGLRenderingContext } from "../interface";
+import { IMetaData, ISceneData, IWebGLRenderingContext } from "../interface";
 import Mesh from "../Mesh";
 import ShadowCollector from "../shader/ShadowCollector";
 import ShadowFloor from "../shader/ShadowFloor";
@@ -11,6 +11,8 @@ import View from "./View";
 import Sky from "../Sky"
 import MeshRenderable from "../MeshRenderable";
 import Lights from "../Lights";
+import Material from "../Material";
+import Archive from "../utils/Archive";
 
 export default class Scene {
     gl: IWebGLRenderingContext;
@@ -33,8 +35,8 @@ export default class Scene {
     frameCounter: number;
     sceneLoaded: boolean;
     debugString: string;
-    metaData: any;
-    materialsList: any[];
+    metaData: IMetaData;
+    materialsList: Material[];
     bounds: any;
     postRender: any;
     cameras: any;
@@ -58,16 +60,16 @@ export default class Scene {
         this.sceneLoaded = false;
         this.debugString = ""
     }
-    load(a) {
-        var c = this.gl, b, d = a.extract("scene.json");
+    load(a:Archive) {
+        var c = this.gl, b:ISceneData, d = a.extract("scene.json");
         if (void 0 !== d) {
             if (!a.checkSignature(d))
                 return false;
-            d = (new ByteStream(d.data)).asString();
-            if (null == d || 0 >= d.length)
+            let data = (new ByteStream(d.data)).asString();
+            if (null == d || 0 >= data.length)
                 return false;
             try {
-                b = JSON.parse(d)
+                b = JSON.parse(data)
             } catch (e) {
                 return console.error(e),
                     false

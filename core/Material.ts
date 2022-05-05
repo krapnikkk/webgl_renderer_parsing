@@ -1,26 +1,27 @@
-import { IExtrasTexCoordRanges, ITextureDesc, IWebGLRenderingContext } from "./interface";
+import { IAnisoParams, IExtrasTexCoordRanges, IMaterialDesc, IMicrofiberParams, IRefractionParams, IskinParams, ITextureDesc, IWebGLRenderingContext } from "./interface";
 import Matrix from "./math/Matrix";
 import Vect from "./math/Vector";
 import Texture from "./Texture";
+import Archive from "./utils/Archive";
 
 export default class Material {
     gl: IWebGLRenderingContext;
-    name: any;
+    name: string;
     textures: { albedo: any; reflectivity: any; normal: any; extras: any; };
     extrasTexCoordRanges: IExtrasTexCoordRanges = {};
     blend: any;
-    alphaTest: any;
+    alphaTest: number;
     usesBlending: boolean;
     usesRefraction: boolean;
     shadowAlphaTest: any;
     castShadows: boolean;
     horizonOcclude: any;
     fresnel: Float32Array;
-    emissiveIntensity: any;
-    skinParams: any;
-    anisoParams: any;
-    microfiberParams: any;
-    refractionParams: any;
+    emissiveIntensity: number;
+    skinParams: IskinParams;
+    anisoParams: IAnisoParams;
+    microfiberParams: IMicrofiberParams;
+    refractionParams: IRefractionParams;
     horizonSmoothing: any;
     vOffset: number;
     uOffset: number;
@@ -29,7 +30,7 @@ export default class Material {
     wireShader: any;
     prepassShader: any;
     refractionShader: any;
-    constructor(gl:IWebGLRenderingContext, c, b) {
+    constructor(gl: IWebGLRenderingContext, archive: Archive, b: IMaterialDesc) {
         this.gl = gl;
         this.name = b.name;
         var d = {
@@ -38,7 +39,7 @@ export default class Material {
             clamp: !!b.textureWrapClamp,
             mirror: !!b.textureWrapMirror
         }
-            , e:ITextureDesc = {
+            , e: ITextureDesc = {
                 mipmap: d.mipmap,
                 clamp: d.clamp,
                 mirror: d.mirror,
@@ -46,23 +47,26 @@ export default class Material {
             };
         e.nofilter || (e.aniso = this.gl.hints.mobile ? 2 : 4);
         this.textures = {
-            albedo: this.gl.textureCache.fromFilesMergeAlpha(c.get(b.albedoTex), c.get(b.alphaTex), e),
-            reflectivity: this.gl.textureCache.fromFilesMergeAlpha(c.get(b.reflectivityTex), c.get(b.glossTex), d),
-            normal: this.gl.textureCache.fromFile(c.get(b.normalTex), d),
-            extras: this.gl.textureCache.fromFilesMergeAlpha(c.get(b.extrasTex), c.get(b.extrasTexA), d)
+            albedo: this.gl.textureCache.fromFilesMergeAlpha(archive.get(b.albedoTex), archive.get(b.alphaTex), e),
+            reflectivity: this.gl.textureCache.fromFilesMergeAlpha(archive.get(b.reflectivityTex), archive.get(b.glossTex), d),
+            normal: this.gl.textureCache.fromFile(archive.get(b.normalTex), d),
+            extras: this.gl.textureCache.fromFilesMergeAlpha(archive.get(b.extrasTex), archive.get(b.extrasTexA), d)
         };
         this.extrasTexCoordRanges = {};
-        if (b.extrasTexCoordRanges)
-            for (var f in b.extrasTexCoordRanges)
+        if (b.extrasTexCoordRanges) {
+            for (var f in b.extrasTexCoordRanges) {
                 this.extrasTexCoordRanges[f] = new Float32Array(b.extrasTexCoordRanges[f].scaleBias);
-        this.textures.extras || (c = new Texture(this.gl, {
+            }
+        }
+        let extrasTex: Texture;
+        this.textures.extras || (extrasTex = new Texture(this.gl, {
             width: 1,
             height: 1
         }),
-            c.loadArray(new Uint8Array([255, 255, 255, 255])),
-            this.textures.extras = c);
+            extrasTex.loadArray(new Uint8Array([255, 255, 255, 255])),
+            this.textures.extras = extrasTex);
         var g = b.blendTint || [1, 1, 1];
-        c = {
+        let blend = {
             none: function () {
                 this.gl.disable(this.gl.BLEND)
             },
@@ -76,33 +80,37 @@ export default class Material {
                 this.gl.blendFunc(this.gl.ONE, this.gl.CONSTANT_COLOR)
             }
         };
-        this.blend = c[b.blend] || c.none;
+        this.blend = blend[b.blend] || blend.none;
         this.alphaTest = b.alphaTest || 0;
-        this.usesBlending = this.blend !== c.none;
+        this.usesBlending = this.blend !== blend.none;
         this.usesRefraction = !!b.refraction;
         this.shadowAlphaTest = this.alphaTest;
-        0 >= this.shadowAlphaTest && this.blend === c.alpha && (this.shadowAlphaTest = 0.5);
-        this.castShadows = this.blend !== c.add;
+        0 >= this.shadowAlphaTest && this.blend === blend.alpha && (this.shadowAlphaTest = 0.5);
+        this.castShadows = this.blend !== blend.add;
         this.horizonOcclude = b.horizonOcclude || 0;
         this.fresnel = new Float32Array(b.fresnel ? b.fresnel : [1, 1, 1]);
         this.emissiveIntensity = b.emissiveIntensity || 1;
-        d = [];
-        e = false;
-        0 < b.lightCount && d.push("#define LIGHT_COUNT " + b.lightCount);
-        b.useNewAttenuation && d.push("#define NEW_ATTENUATION");
-        0 < b.shadowCount && (f = Math.min(b.lightCount, b.shadowCount),
-            this.usesRefraction && 8 >= this.gl.limits.textureCount && (f = 2 < f ? 2 : f),
-            d.push("#define SHADOW_COUNT " + f));
-        0 < b.alphaTest && d.push("#define ALPHA_TEST");
-        b.ggxSpecular && d.push("#define GGX_SPECULAR");
-        this.blend === c.alpha ? d.push("#define TRANSPARENCY_DITHER") : this.blend === c.none && d.push("#define NOBLEND");
-        this.gl.hints.mobile && d.push("#define MOBILE");
-        this.gl.ext.textureDepth && d.push("#define SHADOW_NATIVE_DEPTH");
-        f = function (a) {
+        let defines = [];
+        let flag = false;
+        0 < b.lightCount && defines.push("#define LIGHT_COUNT " + b.lightCount);
+        b.useNewAttenuation && defines.push("#define NEW_ATTENUATION");
+        if(0 < b.shadowCount){
+            let min = Math.min(b.lightCount, b.shadowCount);
+            if(this.usesRefraction && 8 >= this.gl.limits.textureCount) {
+                min = 2 < min ? 2 : min
+            }
+            defines.push("#define SHADOW_COUNT " + min);
+        };
+        0 < b.alphaTest && defines.push("#define ALPHA_TEST");
+        b.ggxSpecular && defines.push("#define GGX_SPECULAR");
+        this.blend === blend.alpha ? defines.push("#define TRANSPARENCY_DITHER") : this.blend === blend.none && defines.push("#define NOBLEND");
+        this.gl.hints.mobile && defines.push("#define MOBILE");
+        this.gl.ext.textureDepth && defines.push("#define SHADOW_NATIVE_DEPTH");
+        let transIntegral = function (a) {
             return 1 / (2 / 3 * 3.1415962 * (a * a + a + 1))
         }
             ;
-        b.useSkin && (d.push("#define SKIN"),
+        b.useSkin && (defines.push("#define SKIN"),
             this.skinParams = b.skinParams || {
                 subdermisColor: [1, 1, 1],
                 transColor: [1, 0, 0, 1],
@@ -116,16 +124,16 @@ export default class Material {
                 transDepth: 0,
                 millimeterScale: 1
             },
-            this.extrasTexCoordRanges.subdermisTex || d.push("#define SKIN_NO_SUBDERMIS_TEX"),
-            this.extrasTexCoordRanges.translucencyTex || d.push("#define SKIN_NO_TRANSLUCENCY_TEX"),
-            this.extrasTexCoordRanges.fuzzTex || d.push("#define SKIN_NO_FUZZ_TEX"),
+            this.extrasTexCoordRanges.subdermisTex || defines.push("#define SKIN_NO_SUBDERMIS_TEX"),
+            this.extrasTexCoordRanges.translucencyTex || defines.push("#define SKIN_NO_TRANSLUCENCY_TEX"),
+            this.extrasTexCoordRanges.fuzzTex || defines.push("#define SKIN_NO_FUZZ_TEX"),
             void 0 === this.skinParams.version && (this.skinParams.version = 1),
-            2 == this.skinParams.version ? (d.push("#define SKIN_VERSION_2"),
+            2 == this.skinParams.version ? (defines.push("#define SKIN_VERSION_2"),
                 this.skinParams.shadowBlur *= 4,
                 this.skinParams.shadowBlur = Math.min(this.skinParams.shadowBlur, 40),
-                this.skinParams.transIntegral = f(0.5 * this.skinParams.transScatter),
+                this.skinParams.transIntegral = transIntegral(0.5 * this.skinParams.transScatter),
                 this.skinParams.fresnelIntegral = 1 / 3.14159 * (1 - 0.5 * this.skinParams.fresnelColor[3]),
-                this.skinParams.transSky = 0) : (d.push("#define SKIN_VERSION_1"),
+                this.skinParams.transSky = 0) : (defines.push("#define SKIN_VERSION_1"),
                     this.skinParams.shadowBlur = 8 * Math.min(this.skinParams.shadowBlur, 1),
                     this.skinParams.transDepth = 0,
                     this.skinParams.transScatter = this.skinParams.transColor[3],
@@ -133,52 +141,52 @@ export default class Material {
                     this.skinParams.fresnelIntegral = 1 / 3.14159 * (1 - 0.5 * this.skinParams.fresnelColor[3]),
                     this.skinParams.transSky *= 1.25,
                     this.skinParams.transIntegral *= 1.25));
-        b.aniso && (d.push("#define ANISO"),
+        b.aniso && (defines.push("#define ANISO"),
             this.anisoParams = b.anisoParams || {
                 strength: 1,
                 tangent: [1, 0, 0],
                 integral: 0.5
             },
-            this.extrasTexCoordRanges.anisoTex || d.push("#define ANISO_NO_DIR_TEX"));
-        b.microfiber && (d.push("#define MICROFIBER"),
+            this.extrasTexCoordRanges.anisoTex || defines.push("#define ANISO_NO_DIR_TEX"));
+        b.microfiber && (defines.push("#define MICROFIBER"),
             this.microfiberParams = b.microfiberParams || {
                 fresnelColor: [0.2, 0.2, 0.2, 0.5],
                 fresnelOcc: 1,
                 fresnelGlossMask: 1
             },
             this.microfiberParams.fresnelIntegral = 1 / 3.14159 * (1 - 0.5 * this.microfiberParams.fresnelColor[3]),
-            this.extrasTexCoordRanges.fuzzTex || d.push("#define MICROFIBER_NO_FUZZ_TEX"));
-        b.refraction && (d.push("#define REFRACTION"),
+            this.extrasTexCoordRanges.fuzzTex || defines.push("#define MICROFIBER_NO_FUZZ_TEX"));
+        b.refraction && (defines.push("#define REFRACTION"),
             this.refractionParams = b.refractionParams || {
                 distantBackground: false,
                 tint: [1, 1, 1],
                 useAlbedoTint: false,
                 IOR: 1.5
             },
-            this.extrasTexCoordRanges.refractionMaskTex || d.push("#define REFRACTION_NO_MASK_TEX"));
-        b.vertexColor && (d.push("#define VERTEX_COLOR"),
-            b.vertexColorsRGB && d.push("#define VERTEX_COLOR_SRGB"),
-            b.vertexColorAlpha && d.push("#define VERTEX_COLOR_ALPHA"));
+            this.extrasTexCoordRanges.refractionMaskTex || defines.push("#define REFRACTION_NO_MASK_TEX"));
+        b.vertexColor && (defines.push("#define VERTEX_COLOR"),
+            b.vertexColorsRGB && defines.push("#define VERTEX_COLOR_SRGB"),
+            b.vertexColorAlpha && defines.push("#define VERTEX_COLOR_ALPHA"));
         this.horizonSmoothing = b.horizonSmoothing || 0;
-        0 < this.horizonSmoothing && d.push("#define HORIZON_SMOOTHING");
-        b.unlitDiffuse && d.push("#define DIFFUSE_UNLIT");
-        this.extrasTexCoordRanges.emissiveTex && (d.push("#define EMISSIVE"),
-            b.emissiveSecondaryUV && (d.push("#define EMISSIVE_SECONDARY_UV"),
-                e = true));
-        this.extrasTexCoordRanges.aoTex && (d.push("#define AMBIENT_OCCLUSION"),
-            b.aoSecondaryUV && (d.push("#define AMBIENT_OCCLUSION_SECONDARY_UV"),
-                e = true));
-        b.tangentOrthogonalize && d.push("#define TSPACE_ORTHOGONALIZE");
-        b.tangentNormalize && d.push("#define TSPACE_RENORMALIZE");
-        b.tangentGenerateBitangent && d.push("#define TSPACE_COMPUTE_BITANGENT");
-        e && d.push("#define TEXCOORD_SECONDARY");
+        0 < this.horizonSmoothing && defines.push("#define HORIZON_SMOOTHING");
+        b.unlitDiffuse && defines.push("#define DIFFUSE_UNLIT");
+        this.extrasTexCoordRanges.emissiveTex && (defines.push("#define EMISSIVE"),
+            b.emissiveSecondaryUV && (defines.push("#define EMISSIVE_SECONDARY_UV"),
+                flag = true));
+        this.extrasTexCoordRanges.aoTex && (defines.push("#define AMBIENT_OCCLUSION"),
+            b.aoSecondaryUV && (defines.push("#define AMBIENT_OCCLUSION_SECONDARY_UV"),
+                flag = true));
+        b.tangentOrthogonalize && defines.push("#define TSPACE_ORTHOGONALIZE");
+        b.tangentNormalize && defines.push("#define TSPACE_RENORMALIZE");
+        b.tangentGenerateBitangent && defines.push("#define TSPACE_COMPUTE_BITANGENT");
+        flag && defines.push("#define TEXCOORD_SECONDARY");
         this.vOffset = this.uOffset = 0;
-        d.push("#define UV_OFFSET ");
-        this.shader = this.gl.shaderCache.fromURLs("matvert.glsl", "matfrag.glsl", d);
-        d.push("#define STRIPVIEW");
-        this.stripShader = this.gl.shaderCache.fromURLs("matvert.glsl", "matfrag.glsl", d);
+        defines.push("#define UV_OFFSET ");
+        this.shader = this.gl.shaderCache.fromURLs("matvert.glsl", "matfrag.glsl", defines);
+        defines.push("#define STRIPVIEW");
+        this.stripShader = this.gl.shaderCache.fromURLs("matvert.glsl", "matfrag.glsl", defines);
         this.wireShader = this.gl.shaderCache.fromURLs("wirevert.glsl", "wirefrag.glsl");
-        this.blend === c.alpha && (this.prepassShader = this.gl.shaderCache.fromURLs("alphaprepassvert.glsl", "alphaprepassfrag.glsl"))
+        this.blend === blend.alpha && (this.prepassShader = this.gl.shaderCache.fromURLs("alphaprepassvert.glsl", "alphaprepassfrag.glsl"))
     }
     bind(a, c) {
         if (!this.complete())

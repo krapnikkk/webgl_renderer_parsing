@@ -1,16 +1,42 @@
 import Button from "./gui/Button"
 import ControlRect from "./gui/ControlRect"
 import ListBox from "./gui/ListBox"
+import Mesh from "./Mesh"
 import ShaderCache from "./shader/ShaderCache"
 import Texture from "./Texture"
 import TextureCache from "./TextureCache"
 
-export interface IViewDesc{
-    angles:number[],
-    pivot:number[],
-    orbitRadius:number,
-    fov:number,
-    limits:number
+
+export interface ISceneData {
+    AnimData: {
+
+    },
+    Cameras: {
+    },
+    mainCamera: {
+        view: IViewDesc
+    },
+    materials: IMaterialDesc[],
+    meshes: Mesh[],
+    metaData: IMetaData,
+    sky: ISkyDesc,
+    lights: ILightDesc
+}
+
+export interface IMetaData {
+    author: string,
+    date: number,
+    link: string,
+    tbVersion: number,
+    title: string
+}
+
+export interface IViewDesc {
+    angles: number[],
+    pivot: number[],
+    orbitRadius: number,
+    fov: number,
+    limits: number
 }
 
 export interface ITextureDesc {
@@ -37,13 +63,108 @@ export interface IMeshDesc {
     isDynamicMesh: boolean
 }
 
-export interface ISkyDesc{
-    diffuseCoefficients:Iterable<number>,
-    backgroundMode:number,
-    backgroundBrightness:number,
-    backgroundColor:Iterable<number>,
+export interface ISkyDesc {
+    imageURL: string,
+    diffuseCoefficients: Iterable<number>,
+    backgroundMode: number,
+    backgroundBrightness: number,
+    backgroundColor: Iterable<number>,
 }
 
+export interface ILightDesc {
+    colors: Float32Array,
+    count: number,
+    positions: Float32Array,
+    directions: Float32Array,
+    rotation: number,
+    shadowCount: number,
+    sky: ISkyDesc,
+    matrixWeights: Float32Array,
+    parameters: Float32Array,
+    useNewAttenuation: boolean
+}
+
+export interface IMaterialDesc {
+    name: string,
+    albedoTex: string,
+    reflectivityTex: string,
+    normalTex: string,
+    glossTex: string,
+    blend: string,
+    alphaTest: number,
+    fresnel: number[],
+    horizonOcclude: number,
+    horizonSmoothing: number,
+    tangentOrthogonalize: boolean,
+    tangentNormalize: boolean,
+    tangentGenerateBitangent: boolean,
+    useSkin: boolean,
+    skinParams: IskinParams,
+    aniso: boolean,
+    microfiber: boolean,
+    refraction: boolean,
+    lightCount: number,
+    shadowCount: number,
+    useNewAttenuation: boolean,
+    textureWrapClamp: boolean,
+    textureWrapMirror: boolean,
+    textureFilterNearest: boolean,
+    extrasTexCoordRanges: IExtrasTexCoordRanges,
+    extrasTex: string,
+    extrasTexA: string,
+    alphaTex: string,
+    blendTint: number[],
+    emissiveIntensity: number,
+    ggxSpecular: boolean,
+    anisoParams: IAnisoParams,
+    microfiberParams: IMicrofiberParams,
+    refractionParams:IRefractionParams,
+    vertexColor:boolean,
+    vertexColorsRGB:boolean,
+    vertexColorAlpha:boolean,
+    unlitDiffuse:boolean,
+    emissiveSecondaryUV:boolean,
+    aoSecondaryUV:boolean,
+}
+
+export interface IAnisoParams {
+    strength: number,
+    tangent: number[],
+    integral: number
+}
+
+export interface IMicrofiberParams {
+    fresnelColor: number[],
+    fresnelOcc: number,
+    fresnelGlossMask: number,
+    fresnelIntegral?:number
+}
+
+export interface IRefractionParams {
+    distantBackground: boolean,
+    tint: number[],
+    useAlbedoTint: boolean,
+    IOR: number,
+    newRefraction?:boolean
+}
+
+export interface IskinParams {
+    version?: number,
+    millimeterScale: number,
+    subdermisColor: number[],
+    transColor: number[],
+    transScatter: number,
+    transDepth: number,
+    fresnelColor: number[],
+    normalSmooth: number,
+    fresnelOcc: number,
+    fresnelGlossMask: number,
+    transSky: number,
+    shadowBlur: number,
+    scaleAdjust?: number,
+    transIntegral?: number,
+    fresnelIntegral?: number
+}
 
 export interface IWebGLRenderingContext extends WebGLRenderingContext {
     length: number
@@ -78,26 +199,26 @@ export interface IWebGLRenderingContext extends WebGLRenderingContext {
     },
     location: number,
     unit: number,
-    textureCache:TextureCache,
-    shaderCache:ShaderCache
+    textureCache: TextureCache,
+    shaderCache: ShaderCache
 }
 
-export interface IShaderParams{
-    uModelViewProjectionMatrix?:WebGLUniformLocation,
-    uLightPositions?:WebGLUniformLocation,
-    uLightDirections?:WebGLUniformLocation,
-    uLightColors?:WebGLUniformLocation,
-    uLightParams?:WebGLUniformLocation,
-    uModelSkyMatrix?:WebGLUniformLocation,
-    uLightSpot?:WebGLUniformLocation,
-    uShadowKernelRotation?:WebGLUniformLocation,
-    uShadowMapSize?:WebGLUniformLocation,
-    uShadowMatrices?:WebGLUniformLocation,
-    uInvShadowMatrices?:WebGLUniformLocation,
-    uShadowTexelPadProjections?:WebGLUniformLocation,
-    uShadowCatcherParams?:WebGLUniformLocation,
-    location?:GLenum
-    uKernel?:GLenum
+export interface IShaderParams {
+    uModelViewProjectionMatrix?: WebGLUniformLocation,
+    uLightPositions?: WebGLUniformLocation,
+    uLightDirections?: WebGLUniformLocation,
+    uLightColors?: WebGLUniformLocation,
+    uLightParams?: WebGLUniformLocation,
+    uModelSkyMatrix?: WebGLUniformLocation,
+    uLightSpot?: WebGLUniformLocation,
+    uShadowKernelRotation?: WebGLUniformLocation,
+    uShadowMapSize?: WebGLUniformLocation,
+    uShadowMatrices?: WebGLUniformLocation,
+    uInvShadowMatrices?: WebGLUniformLocation,
+    uShadowTexelPadProjections?: WebGLUniformLocation,
+    uShadowCatcherParams?: WebGLUniformLocation,
+    location?: GLenum
+    uKernel?: GLenum
 }
 
 export interface IFile {
@@ -122,14 +243,15 @@ export interface IArchiveFileData {
     data: any;
 }
 
-export interface IExtrasTexCoordRanges{
-    subdermisTex?:any,
-    translucencyTex?:any,
-    fuzzTex?:any,
-    anisoTex?:any,
-    refractionMaskTex?:any,
-    aoTex?:any,
-    emissiveTex?:any,
+export interface IExtrasTexCoordRanges {
+    subdermisTex?: any,
+    translucencyTex?: any,
+    fuzzTex?: any,
+    anisoTex?: any,
+    refractionMaskTex?: any,
+    aoTex?: any,
+    emissiveTex?: any,
 }
 
-export type GUIType = Button|ControlRect|ListBox
+
+export type GUIType = Button | ControlRect | ListBox
